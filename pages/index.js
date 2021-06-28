@@ -25,11 +25,11 @@ export async function getStaticProps() {
   // getStaticProps will fetch data at bulid time
   // getServerSideProps will do the same job
 
-  const res = await fetch(`${API_URL}/api/events`);
+  const res = await fetch(`${API_URL}/events?_sort=date:ASC&_limit=2`);
   const events = await res.json();
 
   return {
-    props: { events: events.slice(0, 3) },
+    props: { events },
     revalidate: 1, // revalidate every one second if the data is changed
   };
 }
