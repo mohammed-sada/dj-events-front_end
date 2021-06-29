@@ -1,12 +1,28 @@
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Layout from "@/components/Layout";
 import styles from "@/styles/Event.module.css";
 import { API_URL } from "@/config/index";
 import Link from "next/link";
 import Image from "next/image";
 import { FaPencilAlt, FaTimes } from "react-icons/fa";
+import axios from "axios";
+import { useRouter } from "next/router";
 
 export default function EventPage({ evt }) {
-  const deleteEvent = () => console.log("delete");
+  const router = useRouter();
+
+  const deleteEvent = async () => {
+    if (confirm("Are you sure ?")) {
+      const data = await axios.delete(`${API_URL}/events/${evt.id}`);
+
+      if (data.statusText === "OK") {
+        router.push("/events");
+      } else {
+        toast.error("Something Went Wrong!");
+      }
+    }
+  };
 
   return (
     <Layout>
@@ -36,6 +52,7 @@ export default function EventPage({ evt }) {
           {new Date(evt.date).toLocaleDateString("en-US")} at {evt.time}
         </span>
         <h1>{evt.name}</h1>
+        <ToastContainer />
 
         <h3>Performers</h3>
         <p>{evt.performers}</p>
@@ -52,8 +69,7 @@ export default function EventPage({ evt }) {
   );
 }
 export async function getServerSideProps({ query: { slug } }) {
-  const res = await fetch(`${API_URL}/events?slug=${slug}`);
-  const events = await res.json();
+  const { data: events } = await axios.get(`${API_URL}/events?slug=${slug}`);
 
   return {
     props: { evt: events[0] },
