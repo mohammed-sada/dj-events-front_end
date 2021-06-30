@@ -169,8 +169,10 @@ export default function UpdateEvent({ evt }) {
   );
 }
 
-export async function getServerSideProps({ params: { id } }) {
+export async function getServerSideProps({ params: { id }, req }) {
   const { data: evt } = await axios.get(`${API_URL}/events/${id}`);
+
+  // console.log(req.headers.cookie);
 
   return { props: { evt } };
 }
