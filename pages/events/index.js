@@ -25,7 +25,7 @@ export async function getServerSideProps({ query: { page = 1 } }) {
   const { data: events } = await axios.get(
     `${API_URL}/events?_sort=date:ASC&_limit=${PER_PAGE}&_start=${start}`
   );
-  console.log(events);
+
   return {
     props: { events, page: +page, total },
   };

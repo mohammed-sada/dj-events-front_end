@@ -6,8 +6,12 @@ import Link from "next/link";
 import styles from "@/styles/AuthForm.module.css";
 import Input from "@/components/Input";
 import Layout from "@/components/Layout";
+import { useContext } from "react";
+import AuthContext from "@/context/AuthContext";
 
 export default function loginPage() {
+  const { login, error } = useContext(AuthContext);
+
   const [data, setData] = useState({
     email: "",
     password: "",
@@ -20,7 +24,7 @@ export default function loginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(data);
+    login({ ...data });
   };
 
   return (

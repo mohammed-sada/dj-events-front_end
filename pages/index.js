@@ -25,7 +25,7 @@ export async function getStaticProps() {
   // getStaticProps will fetch data at bulid time
   // getServerSideProps will do the same job
 
-  const res = await fetch(`${API_URL}/events?_sort=date:ASC&_limit=2`);
+  const res = await fetch(`${API_URL}/events?_sort=date:ASC&_limit=3`);
   const events = await res.json();
 
   return {

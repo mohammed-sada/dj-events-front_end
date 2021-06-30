@@ -6,8 +6,12 @@ import Link from "next/link";
 import styles from "@/styles/AuthForm.module.css";
 import Input from "@/components/Input";
 import Layout from "@/components/Layout";
+import { useContext } from "react";
+import AuthContext from "@/context/AuthContext";
 
 export default function RegisterPage() {
+  const { register, error } = useContext(AuthContext);
+
   const [data, setData] = useState({
     username: "",
     email: "",
@@ -22,7 +26,7 @@ export default function RegisterPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (data.password === data.confirmPassword) console.log(data);
+    if (data.password === data.confirmPassword) register(data);
     else {
       toast.error("Passwords must match");
     }
