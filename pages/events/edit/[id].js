@@ -1,17 +1,21 @@
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 import axios from "axios";
+import moment from "moment";
+import { FaImage } from "react-icons/fa";
+
+import { useState } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import Image from "next/image";
+
+import styles from "@/styles/Form.module.css";
 import { API_URL } from "@/config/index";
 import Layout from "@/components/Layout";
-import styles from "@/styles/Form.module.css";
-import Input from "@/components/Input";
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import moment from "moment";
-import Image from "next/image";
-import { FaImage } from "react-icons/fa";
 import Modal from "@/components/Modal";
+import ImageUpload from "@/components/ImageUpload";
+import Input from "@/components/Input";
 
 export default function UpdateEvent({ evt }) {
   const router = useRouter();
@@ -27,7 +31,7 @@ export default function UpdateEvent({ evt }) {
     address,
   });
 
-  const [imagePreview] = useState(
+  const [imagePreview, setImagePreview] = useState(
     evt.image ? evt.image.formats.thumbnail.url : null
   );
   const [showModal, setShowModal] = useState(false);
@@ -62,8 +66,14 @@ export default function UpdateEvent({ evt }) {
     setValues({ ...values, [name]: value });
   };
 
+  const imageUploaded = async () => {
+    const { data: event } = await axios.get(`${API_URL}/events/${evt.id}`);
+    setImagePreview(event.image.formats.thumbnail.url);
+    setShowModal(false);
+  };
+
   return (
-    <Layout title="Add New Event">
+    <Layout title="Edit Event">
       <Link href="/events">
         <a> {"<"} Back to events</a>
       </Link>
@@ -154,7 +164,7 @@ export default function UpdateEvent({ evt }) {
         show={showModal}
         onClose={() => setShowModal(false)}
       >
-        upload the event image{" "}
+        <ImageUpload evtId={evt.id} imageUploaded={imageUploaded} />
       </Modal>
     </Layout>
   );
