@@ -9,7 +9,7 @@ import Layout from "@/components/Layout";
 import { useContext } from "react";
 import AuthContext from "@/context/AuthContext";
 
-export default function RegisterPage() {
+export default function registerPage() {
   const { register, error } = useContext(AuthContext);
 
   const [data, setData] = useState({
