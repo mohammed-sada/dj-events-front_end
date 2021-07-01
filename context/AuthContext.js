@@ -47,9 +47,26 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
     }
   };
-  const register = (user) => {
-    console.log(user);
+  const register = async (user) => {
+    const res = await fetch(`${NEXT_URL}/api/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setUser(data.user);
+      router.push("/account/dashboard");
+    } else {
+      setError(data.message);
+      setError(null);
+    }
   };
+
   const logout = async () => {
     const res = await fetch(`${NEXT_URL}/api/logout`, { method: "POST" });
 
