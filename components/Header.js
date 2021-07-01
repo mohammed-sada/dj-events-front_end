@@ -31,6 +31,9 @@ export default function Header() {
                 <Link href="/events/add">Add Event</Link>
               </li>
               <li>
+                <Link href="/account/dashboard">Dashboard</Link>
+              </li>
+              <li>
                 <button onClick={logout} className="btn-secondary btb-icon">
                   <FaSignOutAlt /> Logout
                 </button>

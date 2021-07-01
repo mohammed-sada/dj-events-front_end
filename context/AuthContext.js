@@ -1,5 +1,4 @@
-import axios from "axios";
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { NEXT_URL } from "@/config/index";
 
 const AuthContext = createContext();
@@ -8,7 +7,10 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
 
-  // Login user
+  useEffect(() => {
+    checkIfLoggedIn();
+  }, []);
+
   const login = async ({ email: identifier, password }) => {
     const res = await fetch(`${NEXT_URL}/api/login`, {
       method: "POST",
@@ -23,8 +25,6 @@ export const AuthProvider = ({ children }) => {
 
     const data = await res.json();
 
-    console.log(data);
-
     if (res.ok) {
       setUser(data.user);
     } else {
@@ -32,14 +32,22 @@ export const AuthProvider = ({ children }) => {
       setError(null);
     }
   };
+
+  const checkIfLoggedIn = async () => {
+    const res = await fetch(`${NEXT_URL}/api/user`);
+    const { user } = await res.json();
+
+    if (res.ok) {
+      setUser(user);
+    } else {
+      setUser(null);
+    }
+  };
   const register = (user) => {
     console.log(user);
   };
   const logout = () => {
     console.log("logout");
-  };
-  const checkIfLoggedIn = (user) => {
-    console.log("check");
   };
 
   return (

@@ -1,7 +1,7 @@
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaUser } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import styles from "@/styles/AuthForm.module.css";
 import Input from "@/components/Input";
@@ -15,6 +15,10 @@ export default function loginPage() {
   const [data, setData] = useState({
     email: "",
     password: "",
+  });
+
+  useEffect(() => {
+    error && toast.error(error);
   });
 
   const handleInputChange = (e) => {
