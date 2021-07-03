@@ -1,12 +1,30 @@
+import { useRouter } from "next/router";
+import axios from "axios";
 import DashboardEvent from "@/components/DashboardEvent";
 import Layout from "@/components/Layout";
 import { API_URL } from "@/config/index";
 import { parseCookies } from "@/helpers/index";
 import styles from "@/styles/Dashboard.module.css";
 
-export default function dashboardPage({ events }) {
-  const handleDelete = (id) => {
-    console.log("delete", id);
+export default function dashboardPage({ events, token }) {
+  const router = useRouter();
+
+  const deleteEvent = async (id) => {
+    if (confirm("Are you sure ?")) {
+      const data = await axios({
+        method: "delete",
+        url: `${API_URL}/events/${id}`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (data.statusText === "OK") {
+        router.reload();
+      } else {
+        toast.error("Something Went Wrong!");
+      }
+    }
   };
   return (
     <Layout>
@@ -16,11 +34,7 @@ export default function dashboardPage({ events }) {
 
         {events.map((evt) => {
           return (
-            <DashboardEvent
-              key={evt.id}
-              evt={evt}
-              handleDelete={handleDelete}
-            />
+            <DashboardEvent key={evt.id} evt={evt} handleDelete={deleteEvent} />
           );
         })}
       </div>
@@ -39,5 +53,5 @@ export async function getServerSideProps({ req }) {
   });
   const events = await data.json();
 
-  return { props: { events } };
+  return { props: { events, token } };
 }

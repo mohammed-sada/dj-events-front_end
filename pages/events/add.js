@@ -1,6 +1,5 @@
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
 import { API_URL } from "@/config/index";
 import Layout from "@/components/Layout";
 import styles from "@/styles/Form.module.css";
@@ -8,8 +7,10 @@ import Input from "@/components/Input";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { parseCookies } from "@/helpers/index";
+import axios from "axios";
 
-export default function AddEvent() {
+export default function AddEvent({ token, events }) {
   const router = useRouter();
 
   const [values, setValues] = useState({
@@ -25,25 +26,40 @@ export default function AddEvent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validation
     const hasEmptyFields = Object.values(values).some(
       (element) => element === ""
     );
-
-    if (hasEmptyFields) {
-      toast.error("Please fill in all fields.");
-    } else {
-      try {
-        const { data: event } = await axios({
-          method: "post",
-          url: `${API_URL}/events`,
-          data: { ...values },
-        });
-
-        router.replace(`/events/${event.slug}`);
-      } catch (error) {
-        console.log(error);
-        toast.error("Something Went Wrong");
+    if (events) {
+      const sameName = events.find((evt) => evt.name === values.name);
+      if (sameName) {
+        toast.error("This event name already exist");
+        return;
       }
+    }
+    if (hasEmptyFields) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    const res = await fetch(`${API_URL}/events`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(values),
+    });
+
+    if (!res.ok) {
+      if (res.status === 403 || res.status === 401) {
+        toast.error("No token included");
+        return;
+      }
+      toast.error("Something Went Wrong");
+    } else {
+      const evt = await res.json();
+      router.replace(`/events/${evt.slug}`);
     }
   };
 
@@ -126,4 +142,13 @@ export default function AddEvent() {
       </form>
     </Layout>
   );
+}
+
+export async function getServerSideProps({ req }) {
+  const { token } = parseCookies(req);
+
+  const { data: events } = await axios.get(`${API_URL}/events`);
+  console.log(events);
+
+  return { props: { token, events } };
 }

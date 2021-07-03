@@ -1,9 +1,9 @@
 import styles from "@/styles/Form.module.css";
 import axios from "axios";
 import { useState } from "react";
-import { API_URL } from "../config";
+import { API_URL } from "@/config/index";
 
-export default function ImageUpload({ evtId, imageUploaded }) {
+export default function ImageUpload({ evtId, imageUploaded, token }) {
   const [image, setImage] = useState(null);
 
   const handleFileChange = (e) => {
@@ -26,6 +26,9 @@ export default function ImageUpload({ evtId, imageUploaded }) {
       method: "post",
       url: `${API_URL}/upload`,
       data: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (data.statusText === "OK") {

@@ -15,8 +15,9 @@ import Layout from "@/components/Layout";
 import Modal from "@/components/Modal";
 import ImageUpload from "@/components/ImageUpload";
 import Input from "@/components/Input";
+import { parseCookies } from "@/helpers/index";
 
-export default function UpdateEvent({ evt }) {
+export default function UpdateEvent({ evt, token }) {
   const router = useRouter();
 
   const { name, performers, description, venue, date, time, address } = evt;
@@ -46,13 +47,15 @@ export default function UpdateEvent({ evt }) {
       toast.error("Please fill in all fields.");
     } else {
       try {
-        const { data: event } = await axios({
+        const res = await axios({
           method: "put",
           url: `${API_URL}/events/${evt.id}`,
           data: { ...values },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
-
-        router.replace(`/events/${event.slug}`);
+        router.replace(`/events/${res.data.slug}`);
       } catch (error) {
         console.log(error);
         toast.error("Something Went Wrong");
@@ -163,7 +166,11 @@ export default function UpdateEvent({ evt }) {
         show={showModal}
         onClose={() => setShowModal(false)}
       >
-        <ImageUpload evtId={evt.id} imageUploaded={imageUploaded} />
+        <ImageUpload
+          evtId={evt.id}
+          imageUploaded={imageUploaded}
+          token={token}
+        />
       </Modal>
     </Layout>
   );
@@ -172,7 +179,7 @@ export default function UpdateEvent({ evt }) {
 export async function getServerSideProps({ params: { id }, req }) {
   const { data: evt } = await axios.get(`${API_URL}/events/${id}`);
 
-  // console.log(req.headers.cookie);
+  const { token } = parseCookies(req);
 
-  return { props: { evt } };
+  return { props: { evt, token } };
 }
